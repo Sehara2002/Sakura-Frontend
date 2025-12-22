@@ -63,7 +63,7 @@ body.bg-sakura::before {
     z-index: -3;
 
     /* ✅ your background image */
-    background: url("/images/back.png") no-repeat center center;
+    background: url("../images/back.png") no-repeat center center;
     background-size: cover;
 
     /* slight soft overlay so text is readable */
@@ -393,7 +393,7 @@ body.bg-sakura::before {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    text-decoration: none;
+
     width: auto;
     padding: 14px 30px;
     border-radius: 999px;
@@ -530,14 +530,14 @@ body.page-home {
 }
 
 .inria-sans-bold-italic {
-    font-family: "Inria Sans", sans-serif;
-    font-weight: 700;
-    font-style: italic;
+  font-family: "Inria Sans", sans-serif;
+  font-weight: 700;
+  font-style: italic;
 }
 
 .caveat-custom {
-    font-family: "Caveat", cursive;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
+  font-family: "Caveat", cursive;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
 }
