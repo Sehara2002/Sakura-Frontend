@@ -44,7 +44,7 @@ body {
 
     /* ✅ allow full scroll height */
     min-height: 100%;
-    overflow-y: none;
+    overflow-y: hidden;
 }
 
 /* =========================
