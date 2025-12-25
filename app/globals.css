@@ -422,7 +422,8 @@ body.bg-sakura::before {
     font-size: 12px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: rgba(42, 31, 37, 0.45);
+    color: rgba(68, 25, 50, 0.45);
+    font-weight: 700;
 }
 
 /* =========================
@@ -541,3 +542,61 @@ body.page-home {
     font-weight: 400;
     font-style: normal;
 }
+
+/* Winter / Christmas mood overlay (no Santa, no gifts) */
+.bg-sakura::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+
+    /* cool tint + soft glow + light vignette */
+    background:
+        radial-gradient(1200px 800px at 20% 20%, rgba(180, 220, 255, 0.22), transparent 55%),
+        radial-gradient(900px 600px at 80% 25%, rgba(255, 210, 235, 0.18), transparent 60%),
+        radial-gradient(1200px 900px at 50% 80%, rgba(0, 0, 0, 0.1), transparent 60%),
+        linear-gradient(180deg, rgba(240, 248, 255, 0.1), rgba(255, 255, 255, 0));
+    mix-blend-mode: soft-light;
+}
+
+/* keep your canvas above background but below cards */
+#sakuraCanvas {
+    z-index: 1;
+}
+.center-wrap,
+.reader-only-wrap {
+    position: relative;
+    z-index: 2;
+}
+
+.bg-sakura::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.55;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(255, 240, 200, 0.2), transparent 22%),
+        radial-gradient(circle at 70% 25%, rgba(255, 220, 240, 0.18), transparent 20%),
+        radial-gradient(circle at 85% 60%, rgba(210, 240, 255, 0.16), transparent 24%),
+        radial-gradient(circle at 35% 75%, rgba(255, 240, 210, 0.14), transparent 26%);
+    filter: blur(6px);
+}
+
+.bg-sakura {
+    /* your background image stays */
+    filter: saturate(0.85) contrast(1.05) brightness(1.03);
+}
+
+.bg-sakura::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+
+    background: radial-gradient(120% 100% at 50% 50%, transparent 60%, rgba(220, 235, 255, 0.25) 100%);
+}
+
