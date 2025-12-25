@@ -1,7 +1,6 @@
 "use client";
 import { useEffect } from "react";
 
-
 function leaveTruth() {
     fetch("/api/logout", { method: "POST" }).finally(() => {
         window.location.href = "/home";
