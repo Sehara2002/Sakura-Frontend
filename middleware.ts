@@ -21,6 +21,7 @@ export function middleware(req: NextRequest) {
   if ((pathname.startsWith("/countdown") || pathname.startsWith("/book")) && !unlocked) {
     const url = req.nextUrl.clone();
     url.pathname = "/auth";
+    req.cookies.clear();
     return NextResponse.redirect(url);
   }
 
