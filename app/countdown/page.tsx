@@ -1,11 +1,20 @@
+"use client";
+
 export const metadata = {
   title: "Sakura • Countdown",
 };
 
+function leaveTruth() {
+  fetch("/api/logout", { method: "POST" })
+    .finally(() => {
+      window.location.href = "/home";
+    });
+}
+
 export default function CountdownPage() {
   return (
     <>
-      <canvas id="sakuraCanvas" suppressHydrationWarning></canvas>
+      <canvas id="sakuraCanvas" suppressHydrationWarning />
 
       <main className="center-wrap">
         <section className="hero-card hero-card-wide countdown-card">
@@ -18,44 +27,28 @@ export default function CountdownPage() {
 
           <div className="count-grid" aria-label="Countdown timer">
             <div className="count-box">
-              <div
-                id="cd-days"
-                className="count-num"
-                suppressHydrationWarning
-              >
+              <div id="cd-days" className="count-num" suppressHydrationWarning>
                 00
               </div>
               <div className="count-label">Days</div>
             </div>
 
             <div className="count-box">
-              <div
-                id="cd-hours"
-                className="count-num"
-                suppressHydrationWarning
-              >
+              <div id="cd-hours" className="count-num" suppressHydrationWarning>
                 00
               </div>
               <div className="count-label">Hours</div>
             </div>
 
             <div className="count-box">
-              <div
-                id="cd-mins"
-                className="count-num"
-                suppressHydrationWarning
-              >
+              <div id="cd-mins" className="count-num" suppressHydrationWarning>
                 00
               </div>
               <div className="count-label">Minutes</div>
             </div>
 
             <div className="count-box">
-              <div
-                id="cd-secs"
-                className="count-num"
-                suppressHydrationWarning
-              >
+              <div id="cd-secs" className="count-num" suppressHydrationWarning>
                 00
               </div>
               <div className="count-label">Seconds</div>
@@ -66,12 +59,24 @@ export default function CountdownPage() {
             SAKURA is Loading.....
           </div>
 
-          <a className="link-back" href="/home">
-            ← Back to Home
-          </a>
+          {/* ✅ Action buttons */}
+          <div style={{ marginTop: "22px", display: "flex", gap: "14px", justifyContent: "center" }}>
+            <button
+              onClick={leaveTruth}
+              className="btn-ghost"
+              type="button"
+            >
+              Leave the Truth
+            </button>
+
+            <a className="btn-ghost" href="/home">
+              Back to Home
+            </a>
+          </div>
         </section>
       </main>
 
+      {/* Effects */}
       <script src="/js/sakura.js"></script>
       <script src="/js/countdown.js"></script>
     </>
