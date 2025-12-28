@@ -1,5 +1,5 @@
 window.addEventListener("load", () => {
-  const RELEASE_DATE = new Date("2026-01-01T00:00:00+05:30");
+  const RELEASE_DATE = new Date("2025-01-01T00:00:00+05:30");
 
   function pad(n) {
     return String(n).padStart(2, "0");
