@@ -64,7 +64,7 @@ body.bg-sakura::before {
     z-index: -3;
 
     /* ✅ your background image */
-    background: url("/images/back3.png") no-repeat center center;
+    background: url("/images/back.png") no-repeat center center;
     background-size: cover;
 
     /* slight soft overlay so text is readable */
