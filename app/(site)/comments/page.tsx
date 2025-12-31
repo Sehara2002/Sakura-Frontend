@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function CommentsPage() {
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("");
   const [color, setColor] = useState("");
+
+  useEffect(() => {
+    document.body.classList.add("page-comments");
+    return () => document.body.classList.remove("page-comments");
+  }, []);
 
   async function submit() {
     setStatus("");

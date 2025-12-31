@@ -1610,3 +1610,26 @@ body.bg-sakura::before {
         white-space: normal;
     }
 }
+
+/* =========================
+   MOBILE SCROLL OVERRIDES
+========================= */
+@media (max-width: 768px) {
+    body.page-admin,
+    body.page-comments,
+    body.page-about {
+        overflow-y: auto; /* ✅ enable scroll */
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* stop forced vertical centering on scroll pages */
+    body.page-admin .center-wrap,
+    body.page-comments .center-wrap,
+    body.page-about .center-wrap {
+        min-height: auto;
+        height: auto;
+        place-items: start center; /* top aligned */
+        padding-top: 96px; /* space for nav */
+        padding-bottom: 40px;
+    }
+}

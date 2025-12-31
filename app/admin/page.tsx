@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 type Stats = {
     site_visits: number;
@@ -29,6 +29,12 @@ async function safeJson(res: Response) {
 }
 
 export default function AdminPage() {
+
+    useEffect(() => {
+        document.body.classList.add("page-admin");
+        return () => document.body.classList.remove("page-admin");
+    }, []);
+
     const [secret, setSecret] = useState("");
     const [tab, setTab] = useState<TabKey>("overview");
 

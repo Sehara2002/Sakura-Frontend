@@ -1,8 +1,16 @@
-export const metadata = {
-  title: "Sakura • About",
-};
+"use client";
+
+import { useEffect } from "react";
+// export const metadata = {
+//   title: "Sakura • About",
+// };
 
 export default function AboutPage() {
+  useEffect(() => {
+    document.body.classList.add("page-about");
+    return () => document.body.classList.remove("page-about");
+  }, []);
+
   return (
     <main className="center-wrap">
       <section className="hero-card hero-card-wide about-card">
@@ -15,7 +23,7 @@ export default function AboutPage() {
           connect what we know and what we can’t yet see. Everything has a hidden story — if we are patient enough to let it speak. Sakura is a story of that kind of people who tries to fight against to the past and embrace the present moment with calmness.
         </p>
 
-        <div className="about-grid">
+        {/* <div className="about-grid">
           <div className="about-box">
             <div className="about-title">Theme</div>
             <div className="about-text">Truth • Time • Present • Memory</div>
@@ -28,7 +36,7 @@ export default function AboutPage() {
             <div className="about-title">Best Experienced</div>
             <div className="about-text">In silence — let the story speak</div>
           </div>
-        </div>
+        </div> */}
 
       </section>
     </main>
