@@ -1066,8 +1066,8 @@ body.page-home {
 }
 
 .book-shell {
-    /* width: min(1100px, 96vw); */
-    height: min(80vh, 860px);
+    width: min(1100px, 96vw);
+    height: min(95vh, 1200px);
     background: rgba(255, 255, 255, 0.55);
     border: 1px solid rgba(255, 92, 138, 0.14);
     border-radius: 22px;

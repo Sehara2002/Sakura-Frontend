@@ -1,11 +1,16 @@
 (async function () {
+
+  function isMobileView() {
+    return window.matchMedia("(max-width: 768px)").matches;
+  }
+
   const bookEl = document.getElementById("book");
   const loadingEl = document.getElementById("loading");
   if (!bookEl) return;
 
   const PDF_URL = "/books/sakura3.pdf";
   const FIRST_BATCH = 6;
-  const SCALE = 1.2;
+  const SCALE = 2.5;
 
   function setLoading(msg) {
     if (loadingEl) loadingEl.textContent = msg;
