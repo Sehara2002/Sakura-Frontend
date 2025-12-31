@@ -70,116 +70,123 @@ export default function AdminPage() {
     }
 
     return (
-        <main className="admin-wrap">
-            {/* Sidebar */}
-            <aside className="admin-sidebar">
-                <div className="admin-brand">
-                    <div className="admin-dot" />
-                    <div>
-                        <div className="admin-title">Admin</div>
-                        <div className="admin-subtitle">Dashboard</div>
-                    </div>
-                </div>
+        <>
+            <canvas id="sakuraCanvas" suppressHydrationWarning></canvas>
 
-                <div className="admin-secret">
-                    <label className="admin-label">Admin Secret</label>
-                    <div className="admin-secret-row">
-                        <input
-                            className="admin-input"
-                            type="password"
-                            value={secret}
-                            onChange={(e) => setSecret(e.target.value)}
-                            placeholder="Enter ADMIN_SECRET"
-                        />
-                        <button className="admin-btn" type="button" onClick={loadAdmin} disabled={loading || !secret}>
-                            {loading ? "Loading..." : "Load"}
+            <main className="admin-wrap">
+                {/* Sidebar */}
+                <aside className="admin-sidebar">
+                    <div className="admin-brand">
+                        <div className="admin-dot" />
+                        <div>
+                            <div className="admin-title">Admin</div>
+                            <div className="admin-subtitle">Dashboard</div>
+                        </div>
+                    </div>
+
+                    <div className="admin-secret">
+                        <label className="admin-label">Admin Secret</label>
+                        <div className="admin-secret-row">
+                            <input
+                                className="admin-input"
+                                type="password"
+                                value={secret}
+                                onChange={(e) => setSecret(e.target.value)}
+                                placeholder="Enter ADMIN_SECRET"
+                            />
+                            <button className="admin-btn" type="button" onClick={loadAdmin} disabled={loading || !secret}>
+                                {loading ? "Loading..." : "Load"}
+                            </button>
+                        </div>
+                        {error && <div className="admin-error">{error}</div>}
+                    </div>
+
+                    <nav className="admin-nav">
+                        <button
+                            className={`admin-nav-btn ${tab === "overview" ? "is-active" : ""}`}
+                            onClick={() => setTab("overview")}
+                            type="button"
+                        >
+                            Overview
                         </button>
-                    </div>
-                    {error && <div className="admin-error">{error}</div>}
-                </div>
+                        <button
+                            className={`admin-nav-btn ${tab === "comments" ? "is-active" : ""}`}
+                            onClick={() => setTab("comments")}
+                            type="button"
+                        >
+                            Comments
+                            {totalComments ? <span className="admin-pill">{totalComments}</span> : null}
+                        </button>
+                    </nav>
 
-                <nav className="admin-nav">
-                    <button
-                        className={`admin-nav-btn ${tab === "overview" ? "is-active" : ""}`}
-                        onClick={() => setTab("overview")}
-                        type="button"
-                    >
-                        Overview
-                    </button>
-                    <button
-                        className={`admin-nav-btn ${tab === "comments" ? "is-active" : ""}`}
-                        onClick={() => setTab("comments")}
-                        type="button"
-                    >
-                        Comments
-                        {totalComments ? <span className="admin-pill">{totalComments}</span> : null}
-                    </button>
-                </nav>
+                    <a className="admin-back" href="/home">
+                        ← Back to Home
+                    </a>
+                </aside>
 
-                <a className="admin-back" href="/home">
-                    ← Back to Home
-                </a>
-            </aside>
-
-            {/* Content */}
-            <section className="admin-content">
-                <div className="admin-content-head">
-                    <h1 className="admin-h1">
-                        {tab === "overview" ? (
-                            <>
-                                Overview <span>Stats</span>
-                            </>
-                        ) : (
-                            <>
-                                Latest <span>Comments</span>
-                            </>
-                        )}
-                    </h1>
-                    <div className="admin-muted">
-                        {stats ? "Live data loaded." : "Enter secret and press Load."}
-                    </div>
-                </div>
-
-                {/* OVERVIEW */}
-                {tab === "overview" && (
-                    <div className="admin-cards">
-                        <div className="admin-card">
-                            <div className="admin-card-title">Site Visits</div>
-                            <div className="admin-card-value">{stats?.site_visits ?? "—"}</div>
+                {/* Content */}
+                <section className="admin-content">
+                    <div className="admin-content-head">
+                        <h1 className="admin-h1">
+                            {tab === "overview" ? (
+                                <>
+                                    Overview <span>Stats</span>
+                                </>
+                            ) : (
+                                <>
+                                    Latest <span>Comments</span>
+                                </>
+                            )}
+                        </h1>
+                        <div className="admin-muted">
+                            {stats ? "Live data loaded." : "Enter secret and press Load."}
                         </div>
-                        <div className="admin-card">
-                            <div className="admin-card-title">Book Opens</div>
-                            <div className="admin-card-value">{stats?.book_opens ?? "—"}</div>
-                        </div>
-                        <div className="admin-card">
-                            <div className="admin-card-title">Comments</div>
-                            <div className="admin-card-value">{stats?.comments ?? comments.length ?? "-"}
+                    </div>
+
+                    {/* OVERVIEW */}
+                    {tab === "overview" && (
+                        <div className="admin-cards">
+                            <div className="admin-card">
+                                <div className="admin-card-title">Site Visits</div>
+                                <div className="admin-card-value">{stats?.site_visits ?? "—"}</div>
+                            </div>
+                            <div className="admin-card">
+                                <div className="admin-card-title">Book Opens</div>
+                                <div className="admin-card-value">{stats?.book_opens ?? "—"}</div>
+                            </div>
+                            <div className="admin-card">
+                                <div className="admin-card-title">Comments</div>
+                                <div className="admin-card-value">{stats?.comments ?? comments.length ?? "-"}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                {/* COMMENTS */}
-                {tab === "comments" && (
-                    <div className="admin-comments">
-                        {comments.length === 0 ? (
-                            <div className="admin-empty">No comments yet.</div>
-                        ) : (
-                            comments.map((c) => (
-                                <div key={c._id} className="admin-comment">
-                                    <div className="admin-comment-head">
-                                        <div className="admin-comment-name">{c.name}</div>
-                                        <div className="admin-comment-meta">
-                                            {new Date(c.createdAt).toLocaleString()} • {c.page}
+                    {/* COMMENTS */}
+                    {tab === "comments" && (
+                        <div className="admin-comments">
+                            {comments.length === 0 ? (
+                                <div className="admin-empty">No comments yet.</div>
+                            ) : (
+                                comments.map((c) => (
+                                    <div key={c._id} className="admin-comment">
+                                        <div className="admin-comment-head">
+                                            <div className="admin-comment-name">{c.name}</div>
+                                            <div className="admin-comment-meta">
+                                                {new Date(c.createdAt).toLocaleString()} • {c.page}
+                                            </div>
                                         </div>
+                                        <div className="admin-comment-body">{c.message}</div>
                                     </div>
-                                    <div className="admin-comment-body">{c.message}</div>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                )}
-            </section>
-        </main>
+                                ))
+                            )}
+                        </div>
+                    )}
+                </section>
+            </main>
+
+            <script src="/js/sakura.js"></script>
+        </>
+
     );
 }
