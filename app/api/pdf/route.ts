@@ -6,7 +6,7 @@ import path from "path";
 
 export async function GET() {
   // ✅ IMPORTANT: put the PDF in a folder that is deployed (see notes below)
-  const pdfPath = path.join(process.cwd(), "protected", "sakura3.pdf");
+  const pdfPath = path.join(process.cwd(), "protected", "V2P1@4x.pdf");
 
   try {
     const pdfBuffer = await fs.readFile(pdfPath);
