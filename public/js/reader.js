@@ -38,7 +38,8 @@
     const availH = Math.max(380, shell.clientHeight - padY);
 
     // Mobile: single page should be wide, Desktop: keep nice reading size
-    let pageW = isMobile() ? Math.min(availW, 430) : Math.min(availW / 2, 520);
+    let pageW = isMobile() ? Math.min(availW, 480) : Math.min(availW / 2, 520);
+
 
     // Keep B5 ratio
     let pageH = pageW * B5_RATIO;
@@ -54,7 +55,7 @@
 
   // Scale PDF page to match the CSS page width
   function getScaleForPage(page, targetCssWidth) {
-    const viewport1 = page.getViewport({ scale: 1 });
+    const viewport1 = page.getViewport({ scale: 0.8 });
     return (targetCssWidth / viewport1.width) * ZOOM_BOOST;
   }
 
