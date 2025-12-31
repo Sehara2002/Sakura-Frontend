@@ -18,7 +18,7 @@ export default function HomePage() {
 
           <div className="home-divider"></div>
 
-          <a className="btn-read" href="/auth">
+          <a className="btn-read" href="/book">
             Read <span className="arrow">→</span>
           </a>
 
