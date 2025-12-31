@@ -1017,3 +1017,48 @@ body.page-home {
         width: 100%;
     }
 }
+
+.reader-only-wrap {
+    position: relative;
+    z-index: 1;
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 18px 12px;
+}
+
+.book-shell {
+    width: min(1100px, 96vw);
+    height: min(80vh, 860px);
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 92, 138, 0.14);
+    border-radius: 22px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
+    padding: 14px;
+    overflow: hidden;
+    position: relative;
+}
+
+#book {
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+}
+
+.loading {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    color: rgba(42, 31, 37, 0.65);
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(6px);
+}
+
+#book {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}

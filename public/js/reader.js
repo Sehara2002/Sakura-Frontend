@@ -1,95 +1,123 @@
-// public/js/reader.js
-
-(() => {
+(async function () {
   const bookEl = document.getElementById("book");
   const loadingEl = document.getElementById("loading");
-
   if (!bookEl) return;
 
-  // ✅ Set PDF.js worker correctly (avoid "fake worker")
-  if (window.pdfjsLib) {
+  const PDF_URL = "/books/sakura3.pdf";
+  const FIRST_BATCH = 6;
+  const SCALE = 1.2;
+
+  function setLoading(msg) {
+    if (loadingEl) loadingEl.textContent = msg;
+  }
+
+  try {
+    if (!window.pdfjsLib) throw new Error("pdfjsLib not loaded");
+    if (!window.St) throw new Error("PageFlip (St) not loaded");
+
     pdfjsLib.GlobalWorkerOptions.workerSrc =
       "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-  } else {
-    console.error("pdfjsLib not found. Make sure pdf.min.js is loaded before reader.js");
-    return;
-  }
 
-  // ✅ Your PDF location (DIRECT from public/)
-  const PDF_URL = "/books/sakura3.pdf";
+    setLoading("Opening PDF…");
 
-  // Tune for performance/quality
-  const SCALE = 1.6;          // 1.2–1.8 good
-  const RENDER_DPI = 1;       // keep 1 (higher = slower)
-  const MAX_PAGES = 9999;     // or set a limit if you want
+    const pdf = await pdfjsLib.getDocument({
+      url: PDF_URL,
+      // if you face range issues on some hosts, uncomment:
+      // disableRange: true,
+      // disableStream: true,
+    }).promise;
 
-  async function renderPageToImage(pdf, pageNum) {
-    const page = await pdf.getPage(pageNum);
-    const viewport = page.getViewport({ scale: SCALE * RENDER_DPI });
+    const total = pdf.numPages;
 
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d", { alpha: false });
+    // Clear container
+    bookEl.innerHTML = "";
 
-    canvas.width = Math.floor(viewport.width);
-    canvas.height = Math.floor(viewport.height);
+    async function renderPage(pageNum) {
+      const page = await pdf.getPage(pageNum);
+      const viewport = page.getViewport({ scale: SCALE });
 
-    await page.render({ canvasContext: ctx, viewport }).promise;
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
 
-    const img = document.createElement("img");
-    img.alt = `Page ${pageNum}`;
-    img.draggable = false;
-    img.style.width = "100%";
-    img.style.height = "100%";
-    img.src = canvas.toDataURL("image/jpeg", 0.92);
+      canvas.width = Math.floor(viewport.width);
+      canvas.height = Math.floor(viewport.height);
 
-    return img;
-  }
+      await page.render({ canvasContext: ctx, viewport }).promise;
 
-  async function init() {
-    try {
-      if (loadingEl) loadingEl.textContent = "Loading book…";
+      const wrapper = document.createElement("div");
+      wrapper.className = "page";
+      wrapper.appendChild(canvas);
 
-      // ✅ Load PDF
-      const loadingTask = pdfjsLib.getDocument({
-        url: PDF_URL,
-        withCredentials: false,
-        // cMapUrl and standardFontDataUrl are optional; leave default unless needed
-      });
+      return wrapper;
+    }
 
-      const pdf = await loadingTask.promise;
+    // 1) Render first pages and mount them
+    const first = Math.min(FIRST_BATCH, total);
+    for (let p = 1; p <= first; p++) {
+      setLoading(`Preparing ${p}/${total}…`);
+      const pageDiv = await renderPage(p);
+      bookEl.appendChild(pageDiv);
+    }
 
-      // ✅ Render pages
-      const total = Math.min(pdf.numPages, MAX_PAGES);
-      const pages = [];
+    // 2) Start flipbook using currently available pages
+    const pageFlip = new St.PageFlip(bookEl, {
+      width: 520,
+      height: 720,
+      size: "stretch",
+      showCover: true,
+      maxShadowOpacity: 0.25,
+      mobileScrollSupport: true,
+    });
 
-      for (let i = 1; i <= total; i++) {
-        if (loadingEl) loadingEl.textContent = `Loading page ${i} / ${total}…`;
-        const img = await renderPageToImage(pdf, i);
-        pages.push(img);
+    pageFlip.loadFromHTML(bookEl.querySelectorAll(".page"));
+
+    // Helper: refresh PageFlip safely
+    function refreshFlipbook() {
+      const current =
+        typeof pageFlip.getCurrentPageIndex === "function"
+          ? pageFlip.getCurrentPageIndex()
+          : 0;
+
+      // ✅ IMPORTANT: updateFromHtml makes PageFlip include new pages
+      if (typeof pageFlip.updateFromHtml === "function") {
+        pageFlip.updateFromHtml(bookEl.querySelectorAll(".page"));
+      } else {
+        // fallback (rare): rebuild
+        pageFlip.loadFromHTML(bookEl.querySelectorAll(".page"));
       }
 
-      // ✅ Init PageFlip
-      const pageFlip = new St.PageFlip(bookEl, {
-        width: 440,          // base page width
-        height: 620,         // base page height
-        size: "stretch",
-        minWidth: 300,
-        maxWidth: 1000,
-        minHeight: 400,
-        maxHeight: 1400,
-        maxShadowOpacity: 0.2,
-        showCover: true,
-        mobileScrollSupport: true,
-      });
-
-      pageFlip.loadFromHTML(pages);
-
-      if (loadingEl) loadingEl.style.display = "none";
-    } catch (err) {
-      console.error(err);
-      if (loadingEl) loadingEl.textContent = "Failed to load book.";
+      // Try to restore current page if API exists
+      if (typeof pageFlip.turnToPage === "function") {
+        pageFlip.turnToPage(current);
+      }
     }
-  }
 
-  init();
+    // 3) Render the rest in background, but hide them until PageFlip updates
+    setLoading("Loading remaining pages…");
+
+    for (let p = first + 1; p <= total; p++) {
+      await new Promise((r) => setTimeout(r, 0));
+
+      const pageDiv = await renderPage(p);
+
+      // ✅ prevent "last page stuck visible" while it's not inside PageFlip yet
+      pageDiv.style.display = "none";
+
+      bookEl.appendChild(pageDiv);
+
+      // ✅ refresh every few pages
+      if (p % 3 === 0 || p === total) {
+        refreshFlipbook();
+
+        // after refresh, let PageFlip control display
+        bookEl.querySelectorAll(".page").forEach((el) => (el.style.display = ""));
+        setLoading(`Loaded ${p}/${total}…`);
+      }
+    }
+
+    if (loadingEl) loadingEl.style.display = "none";
+  } catch (err) {
+    console.error(err);
+    if (loadingEl) loadingEl.textContent = "Failed to load book.";
+  }
 })();
