@@ -17,17 +17,29 @@ export default function CommentsPage() {
         body: JSON.stringify({ name, message, page: "comments" }),
       });
 
-      const data = await res.json();
+      const text = await res.text(); // ✅ read raw first
+      let data: any = null;
+
+      try {
+        data = text ? JSON.parse(text) : null;
+      } catch {
+        throw new Error(text || `Server returned ${res.status} but not JSON`);
+      }
+
       if (!res.ok) throw new Error(data?.error || "Failed");
 
       setName("");
       setMessage("");
       setColor("green");
-      setStatus("Comment posted successfully! Thank you so much for sharing your thoughts with us.");
+      setStatus(
+        "Comment posted successfully! Thank you so much for sharing your thoughts with us."
+      );
     } catch (e: any) {
+      setColor("crimson");
       setStatus("❌ " + (e.message || "Error"));
     }
   }
+
 
   return (
     <main className="center-wrap">
@@ -59,7 +71,7 @@ export default function CommentsPage() {
           </button>
         </div>
 
-        {status && <p className="hint-text" style={{ marginTop: 12, color:color }}>{status}</p>}
+        {status && <p className="hint-text" style={{ marginTop: 12, color: color }}>{status}</p>}
 
         <a className="link-back" href="/home">← Back to Home</a>
       </section>
