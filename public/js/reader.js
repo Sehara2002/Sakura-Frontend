@@ -1,4 +1,4 @@
-alert(`innerWidth=${window.innerWidth}, matchMobile=${window.matchMedia("(max-width: 768px)").matches}`);
+// alert(`innerWidth=${window.innerWidth}, matchMobile=${window.matchMedia("(max-width: 768px)").matches}`);
 
 
 (async () => {
