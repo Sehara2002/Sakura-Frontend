@@ -1,6 +1,17 @@
-
+"use client";
+import { useEffect } from "react";
 
 export default function HomePage() {
+
+
+  useEffect(() => {
+    fetch("/api/stats", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key: "site_visits" }),
+    }).catch(() => { });
+  }, []);
+
   return (
     <>
       {/* Canvas is controlled by sakura.js (it changes width/height), so ignore hydration diffs */}

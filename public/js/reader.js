@@ -1,3 +1,6 @@
+alert(`innerWidth=${window.innerWidth}, matchMobile=${window.matchMedia("(max-width: 768px)").matches}`);
+
+
 (async () => {
   const { pdfjsLib } = window;
   const bookEl = document.getElementById("book");

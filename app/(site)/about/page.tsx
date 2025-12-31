@@ -10,9 +10,9 @@ export default function AboutPage() {
           About <span>Sakura</span>
         </h1>
 
-        <p className="subtitle" style={{ maxWidth: "62ch" }}>
-          Sakura is a story of unseen truth of life — where time, memory, and the present
-          connect what we know and what we can’t yet see.
+        <p className="subtitle" style={{ maxWidth: "auto" }}>
+          Sakura is not only a traditional poetry collection. It is a story of unseen truth of life  where time, memory, and the present
+          connect what we know and what we can’t yet see. Everything has a hidden story — if we are patient enough to let it speak. Sakura is a story of that kind of people who tries to fight against to the past and embrace the present moment with calmness.
         </p>
 
         <div className="about-grid">
@@ -30,9 +30,6 @@ export default function AboutPage() {
           </div>
         </div>
 
-        <a className="link-back" href="/home">
-          ← Back to Home
-        </a>
       </section>
     </main>
   );

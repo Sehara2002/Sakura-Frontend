@@ -1,10 +1,18 @@
+"use client";
 import Script from "next/script";
+import { useEffect } from "react";
 
-export const metadata = {
-  title: "Sakura • Reader",
-};
 
 export default function BookPage() {
+
+  useEffect(() => {
+    fetch("/api/stats", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key: "book_opens" }),
+    }).catch(() => { });
+  }, []);
+
   return (
     <>
       {/* Canvas animation */}
