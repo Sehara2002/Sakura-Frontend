@@ -1,19 +1,45 @@
 (async function () {
-
-  function isMobileView() {
-    return window.matchMedia("(max-width: 768px)").matches;
-  }
-
   const bookEl = document.getElementById("book");
   const loadingEl = document.getElementById("loading");
   if (!bookEl) return;
 
   const PDF_URL = "/books/sakura3.pdf";
   const FIRST_BATCH = 6;
-  const SCALE = 2.5;
+  const SCALE = 2.5; // your zoom
 
   function setLoading(msg) {
     if (loadingEl) loadingEl.textContent = msg;
+  }
+
+  // ✅ responsive helpers
+  function isMobileView() {
+    return window.matchMedia("(max-width: 768px)").matches;
+  }
+
+  function getFlipSize() {
+    // Use the real container size so it behaves correctly in DevTools responsive mode
+    const rect = bookEl.getBoundingClientRect();
+
+    // Fallback if rect not ready
+    const containerW = Math.max(320, Math.floor(rect.width || window.innerWidth));
+    const containerH = Math.max(420, Math.floor(rect.height || window.innerHeight * 0.85));
+
+    if (isMobileView()) {
+      // ✅ single page: page width = container width
+      return {
+        width: containerW,
+        height: containerH,
+        showCover: false, // ✅ IMPORTANT on mobile
+      };
+    }
+
+    // ✅ desktop: two pages (spread). width/height are single-page size.
+    // Use your original values to keep layout stable.
+    return {
+      width: 520,
+      height: 720,
+      showCover: true,
+    };
   }
 
   try {
@@ -27,7 +53,6 @@
 
     const pdf = await pdfjsLib.getDocument({
       url: PDF_URL,
-      // if you face range issues on some hosts, uncomment:
       // disableRange: true,
       // disableStream: true,
     }).promise;
@@ -65,11 +90,16 @@
     }
 
     // 2) Start flipbook using currently available pages
+    const initial = getFlipSize();
+
     const pageFlip = new St.PageFlip(bookEl, {
-      width: 520,
-      height: 720,
+      width: initial.width,
+      height: initial.height,
       size: "stretch",
-      showCover: true,
+
+      // ✅ key: mobile single page
+      showCover: initial.showCover,
+
       maxShadowOpacity: 0.25,
       mobileScrollSupport: true,
     });
@@ -83,21 +113,45 @@
           ? pageFlip.getCurrentPageIndex()
           : 0;
 
-      // ✅ IMPORTANT: updateFromHtml makes PageFlip include new pages
       if (typeof pageFlip.updateFromHtml === "function") {
         pageFlip.updateFromHtml(bookEl.querySelectorAll(".page"));
       } else {
-        // fallback (rare): rebuild
         pageFlip.loadFromHTML(bookEl.querySelectorAll(".page"));
       }
 
-      // Try to restore current page if API exists
       if (typeof pageFlip.turnToPage === "function") {
         pageFlip.turnToPage(current);
       }
     }
 
-    // 3) Render the rest in background, but hide them until PageFlip updates
+    // ✅ Resize handler: update flip size when switching between mobile/desktop
+    let lastMobile = isMobileView();
+    function applyResponsiveSize() {
+      const nowMobile = isMobileView();
+      const { width, height, showCover } = getFlipSize();
+
+      // If PageFlip has update(), use it
+      if (typeof pageFlip.update === "function") {
+        pageFlip.update({ width, height, size: "stretch", showCover });
+      } else {
+        // fallback: nothing (most builds have update)
+      }
+
+      // If mode changed, rebuild pages layout
+      if (nowMobile !== lastMobile) {
+        lastMobile = nowMobile;
+        refreshFlipbook();
+      }
+    }
+
+    // debounce resize
+    let t = null;
+    window.addEventListener("resize", () => {
+      clearTimeout(t);
+      t = setTimeout(applyResponsiveSize, 180);
+    });
+
+    // 3) Render the rest in background
     setLoading("Loading remaining pages…");
 
     for (let p = first + 1; p <= total; p++) {
@@ -105,18 +159,17 @@
 
       const pageDiv = await renderPage(p);
 
-      // ✅ prevent "last page stuck visible" while it's not inside PageFlip yet
+      // prevent "last page stuck visible"
       pageDiv.style.display = "none";
-
       bookEl.appendChild(pageDiv);
 
-      // ✅ refresh every few pages
       if (p % 3 === 0 || p === total) {
         refreshFlipbook();
-
-        // after refresh, let PageFlip control display
         bookEl.querySelectorAll(".page").forEach((el) => (el.style.display = ""));
         setLoading(`Loaded ${p}/${total}…`);
+
+        // keep responsive sizes correct while loading
+        applyResponsiveSize();
       }
     }
 

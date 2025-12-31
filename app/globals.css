@@ -1103,3 +1103,10 @@ body.page-home {
     height: 100%;
     overflow: hidden;
 }
+
+@media (max-width: 768px) {
+    .book-shell {
+        width: 96vw;
+        height: 92vh;
+    }
+}
