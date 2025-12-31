@@ -92,13 +92,23 @@
     // 2) Start flipbook using currently available pages
     const initial = getFlipSize();
 
-    const pageFlip = new St.PageFlip(bookEl, {
-      width: initial.width,
-      height: initial.height,
-      size: "stretch",
+    const mobile = window.matchMedia("(max-width: 768px)").matches;
 
-      // ✅ key: mobile single page
-      showCover: initial.showCover,
+    // container size (real size in iPhone safari too)
+    const cw = Math.max(320, bookEl.clientWidth);
+    const ch = Math.max(420, bookEl.clientHeight);
+
+    const pageFlip = new St.PageFlip(bookEl, {
+      // Desktop (your original)
+      width: mobile ? cw : 520,
+      height: mobile ? ch : 720,
+
+      // ✅ IMPORTANT: force single page on phones
+      usePortrait: mobile,
+      showCover: !mobile,      // cover on mobile often triggers spread behavior
+
+      // ✅ On mobile, fixed sizing behaves better than stretch
+      size: mobile ? "fixed" : "stretch",
 
       maxShadowOpacity: 0.25,
       mobileScrollSupport: true,
