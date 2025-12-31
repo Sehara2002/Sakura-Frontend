@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 
 export async function GET() {
-  const pdfPath = path.join(process.cwd(), "protected", "sakura2.pdf");
+  const pdfPath = path.join(process.cwd(), "protected", "sakura3.pdf");
 
   if (!fs.existsSync(pdfPath)) {
     return NextResponse.json({ ok: false, error: "PDF not found" }, { status: 404 });
