@@ -5,10 +5,11 @@
 
   const { pdfjsLib } = window;
 
-  const pdfUrl = "/api/pdf";
+  const pdfUrl = "../V2P1@4x.pdf";
   const loadingEl = document.getElementById("loading");
   const bookEl = document.getElementById("book");
 
+  console.log("PDF.js version:", pdfUrl);
   // ----------------------------
   // Procedural flip sound (no file)
   // ----------------------------
