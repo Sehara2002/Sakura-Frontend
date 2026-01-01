@@ -1244,6 +1244,7 @@ body.bg-sakura::before {
     background: rgba(255, 255, 255, 0.35);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
+    text-align: center !important;
 }
 
 /* Home button */
@@ -1617,8 +1618,9 @@ body.bg-sakura::before {
 @media (max-width: 768px) {
     body.page-admin,
     body.page-comments,
-    body.page-about {
-        overflow-y: auto; /* ✅ enable scroll */
+    body.page-about,
+    body.page-author {
+        overflow-y: auto !important; /* ✅ enable scroll */
         -webkit-overflow-scrolling: touch;
     }
 
@@ -1632,4 +1634,12 @@ body.bg-sakura::before {
         padding-top: 96px; /* space for nav */
         padding-bottom: 40px;
     }
+}
+
+
+.subtitle-sinhala{
+    font-size: 1.1em;
+    font-weight: bold;
+    text-align: center;
+    line-height: 25px;
 }
