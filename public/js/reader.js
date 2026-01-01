@@ -68,7 +68,7 @@
       if (!pdfjsLib) throw new Error("pdfjsLib not loaded");
 
       loadingEl.style.display = "grid";
-      setLoading("Opening PDF…");
+      setLoading("Unveiling Truth…");
       bookEl.innerHTML = "";
 
       const { width, height } = computePageSize();
@@ -94,7 +94,7 @@
 
       const pages = [];
       for (let i = 1; i <= pdf.numPages; i++) {
-        setLoading(`Rendering ${i}/${pdf.numPages}…`);
+        setLoading(`Revealing Truth in ${i}/${pdf.numPages}…`);
 
         const page = await pdf.getPage(i);
 
