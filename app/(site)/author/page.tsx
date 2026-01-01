@@ -17,7 +17,7 @@ export default function AuthorPage() {
                 </p>
 
                 {/* English (quoted) */}
-                <p className="subtitle" style={{ marginTop: 20, marginBottom: 0 }}>
+                <p className="subtitle subtitle-sinhala" style={{ marginTop: 20, marginBottom: 0 }}>
                     “Sakura is a reality created from a boundary beyond a literary creation. It does not end with one poetic creation or one work. Sakura can be described as an attempt to convince reality as much as possible at every moment. Reality has no end. Sakura tried to bring a very small amount of the reality that inherits an eternal existence closer through the first chapter. Although one chapter of the samurai's life ends like this, that same end is the beginning of a new chapter. Until we meet with the next chapter of reality, thank you very much, witnesses of reality who fell in love with Sakura”
                 </p>
             </section>
