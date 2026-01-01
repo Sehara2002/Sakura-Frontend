@@ -8,11 +8,14 @@
   // B5 ratio (height / width)
   const B5_RATIO = 250 / 176;
 
-  // retina sharpness (cap 2 to avoid huge memory)
-  const DPR = Math.min(2, window.devicePixelRatio || 1);
+  // Render a few pages first so the book appears quickly
+  const FIRST_BATCH = 4;
 
-  // small zoom boost (increase to 1.10 if you want slightly bigger)
-  const ZOOM_BOOST = 1.1;
+  // Render remaining pages in background with limited parallelism
+  const CONCURRENCY = 2;
+
+  // Small zoom boost (keep small for speed)
+  const ZOOM_BOOST = 1.02;
 
   function setLoading(msg) {
     if (loadingEl) loadingEl.textContent = msg;
@@ -22,7 +25,12 @@
     return window.matchMedia("(max-width: 768px)").matches;
   }
 
-  // Wait for layout so clientWidth/clientHeight are correct (important on first load)
+  // ✅ Speed: lower DPR on mobile (huge performance gain)
+  function getDPR() {
+    const dpr = window.devicePixelRatio || 1;
+    return isMobile() ? Math.min(1.25, dpr) : Math.min(1.75, dpr);
+  }
+
   async function waitForLayout() {
     for (let i = 0; i < 20; i++) {
       const shell = bookEl.parentElement;
@@ -31,7 +39,6 @@
     }
   }
 
-  // Compute SINGLE page size (PageFlip's width/height = one page)
   function computePageSize() {
     const shell = bookEl.parentElement; // .book-shell
     const styles = window.getComputedStyle(shell);
@@ -44,16 +51,16 @@
     const availW = Math.max(280, shell.clientWidth - padX);
     const availH = Math.max(360, shell.clientHeight - padY);
 
-    // ✅ Desktop spread needs: 2 pages visible => each page <= availW/2
-    // ✅ Mobile needs: 1 page visible => page <= availW
+    // Desktop: 2-page spread => each page <= availW/2
+    // Mobile: 1 page => page <= availW
     let pageW = isMobile() ? availW : availW / 2;
 
-    // cap sizes to keep realistic (optional)
+    // Cap sizes
     pageW = isMobile() ? Math.min(pageW, 520) : Math.min(pageW, 600);
 
     let pageH = pageW * B5_RATIO;
 
-    // If too tall, fit by height
+    // Fit by height if needed
     if (pageH > availH) {
       pageH = availH;
       pageW = pageH / B5_RATIO;
@@ -67,88 +74,154 @@
     return (targetCssWidth / viewport1.width) * ZOOM_BOOST;
   }
 
+  function makePageWrapper() {
+    const wrapper = document.createElement("div");
+    wrapper.className = "page";
+    wrapper.style.width = "100%";
+    wrapper.style.height = "100%";
+    wrapper.style.background = "white";
+    wrapper.style.overflow = "hidden";
+    wrapper.style.borderRadius = "10px";
+    return wrapper;
+  }
+
+  // Render page into wrapper
+  async function renderIntoWrapper(pdf, pageNum, wrapper, targetWidthCss) {
+    const page = await pdf.getPage(pageNum);
+
+    const dpr = getDPR();
+    const scale = getRenderScale(page, targetWidthCss);
+    const viewport = page.getViewport({ scale: scale * dpr });
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d", { alpha: false });
+
+    canvas.width = Math.floor(viewport.width);
+    canvas.height = Math.floor(viewport.height);
+
+    // CSS size matches flip page size
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+    canvas.style.display = "block";
+
+    await page.render({ canvasContext: ctx, viewport }).promise;
+
+    wrapper.innerHTML = "";
+    wrapper.appendChild(canvas);
+  }
+
+  // Simple concurrency runner
+  async function runWithConcurrency(tasks, concurrency) {
+    let index = 0;
+    const workers = new Array(concurrency).fill(0).map(async () => {
+      while (index < tasks.length) {
+        const myIndex = index++;
+        await tasks[myIndex]();
+      }
+    });
+    await Promise.all(workers);
+  }
+
   let pageFlip = null;
-  let building = false;
+  let buildToken = 0;
 
   async function build() {
-    if (building) return;
-    building = true;
+    const token = ++buildToken;
 
     try {
       if (!window.pdfjsLib) throw new Error("pdfjsLib not loaded");
       if (!window.St) throw new Error("PageFlip (St) not loaded");
 
-      // ✅ IMPORTANT: set worker to your local file (recommended)
-      // Make sure you have: /public/js/pdf.worker.min.js
+      // ✅ Best: host worker locally (fast + avoids cold-start failures)
       window.pdfjsLib.GlobalWorkerOptions.workerSrc = "/js/pdf.worker.min.js";
 
       if (loadingEl) loadingEl.style.display = "grid";
       setLoading("Opening PDF…");
 
-      // ensure correct element sizes
       await waitForLayout();
 
       bookEl.innerHTML = "";
 
       const { width, height } = computePageSize();
 
-      // create flipbook
+      // Create flipbook immediately (fast UI)
       pageFlip = new St.PageFlip(bookEl, {
         width,
         height,
         size: "fixed",
-
         minWidth: width,
         maxWidth: width,
         minHeight: height,
         maxHeight: height,
 
-        // ✅ THIS is the key for mobile = single page, desktop = 2 pages
-        usePortrait: isMobile(), // force portrait mode only on mobile
+        usePortrait: isMobile(), // ✅ mobile 1 page, desktop 2 pages
         showCover: true,
-
         mobileScrollSupport: true,
         maxShadowOpacity: 0.28,
       });
 
-      const pdf = await window.pdfjsLib.getDocument({ url: PDF_URL }).promise;
+      // Load PDF with settings that can improve reliability on some hosts
+      const pdf = await window.pdfjsLib.getDocument({
+        url: PDF_URL,
+        // If you still get random "Failed to load" on first open, enable these:
+        // disableRange: true,
+        // disableStream: true,
+      }).promise;
 
-      const pages = [];
-      for (let i = 1; i <= pdf.numPages; i++) {
-        setLoading(`Rendering ${i}/${pdf.numPages}…`);
+      const total = pdf.numPages;
 
-        const page = await pdf.getPage(i);
-
-        // scale to match CSS width, render with DPR for sharpness
-        const scale = getRenderScale(page, width);
-        const viewport = page.getViewport({ scale: scale * DPR });
-
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d", { alpha: false });
-
-        canvas.width = Math.floor(viewport.width);
-        canvas.height = Math.floor(viewport.height);
-
-        // CSS must match flip page size
-        canvas.style.width = "100%";
-        canvas.style.height = "100%";
-        canvas.style.display = "block";
-
-        await page.render({ canvasContext: ctx, viewport }).promise;
-
-        const wrapper = document.createElement("div");
-        wrapper.className = "page";
-        wrapper.style.width = "100%";
-        wrapper.style.height = "100%";
-        wrapper.style.background = "white";
-        wrapper.style.overflow = "hidden";
-        wrapper.style.borderRadius = "10px";
-
-        wrapper.appendChild(canvas);
-        pages.push(wrapper);
+      // Create placeholder pages (instant)
+      const wrappers = [];
+      for (let i = 1; i <= total; i++) {
+        const w = makePageWrapper();
+        // tiny skeleton so it doesn’t look empty
+        w.style.display = "grid";
+        w.style.placeItems = "center";
+        w.style.color = "rgba(0,0,0,0.35)";
+        w.style.fontWeight = "800";
+        w.textContent = "Loading…";
+        wrappers.push(w);
       }
 
-      pageFlip.loadFromHTML(pages);
+      // Load placeholders into PageFlip immediately
+      pageFlip.loadFromHTML(wrappers);
+
+      // Render FIRST_BATCH first (so flip works quickly)
+      const first = Math.min(FIRST_BATCH, total);
+      for (let p = 1; p <= first; p++) {
+        if (token !== buildToken) return;
+        setLoading(`Rendering ${p}/${total}…`);
+        await renderIntoWrapper(pdf, p, wrappers[p - 1], width);
+      }
+
+      // Refresh flipbook after first pages ready
+      if (typeof pageFlip.updateFromHtml === "function") {
+        pageFlip.updateFromHtml(bookEl.querySelectorAll(".page"));
+      } else {
+        pageFlip.loadFromHTML(bookEl.querySelectorAll(".page"));
+      }
+
+      // Background render remaining pages (fast + non-blocking)
+      setLoading("Loading remaining pages…");
+
+      const tasks = [];
+      for (let p = first + 1; p <= total; p++) {
+        tasks.push(async () => {
+          if (token !== buildToken) return;
+          await renderIntoWrapper(pdf, p, wrappers[p - 1], width);
+        });
+      }
+
+      await runWithConcurrency(tasks, CONCURRENCY);
+
+      // Final refresh so PageFlip knows all pages are fully ready
+      if (token !== buildToken) return;
+
+      if (typeof pageFlip.updateFromHtml === "function") {
+        pageFlip.updateFromHtml(bookEl.querySelectorAll(".page"));
+      } else {
+        pageFlip.loadFromHTML(bookEl.querySelectorAll(".page"));
+      }
 
       if (loadingEl) loadingEl.style.display = "none";
 
@@ -164,12 +237,10 @@
         loadingEl.style.display = "grid";
         loadingEl.textContent = "Failed to load book.";
       }
-    } finally {
-      building = false;
     }
   }
 
-  // initial build
+  // build once
   await build();
 
   // rebuild on resize/orientation (debounced)
