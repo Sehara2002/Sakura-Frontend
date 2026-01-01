@@ -68,7 +68,7 @@
       if (!pdfjsLib) throw new Error("pdfjsLib not loaded");
 
       loadingEl.style.display = "grid";
-      setLoading("Unveiling Truth…");
+      setLoading("Patience is essential to knowing the truth… Wait for a while………");
       bookEl.innerHTML = "";
 
       const { width, height } = computePageSize();
