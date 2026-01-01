@@ -1636,10 +1636,262 @@ body.bg-sakura::before {
     }
 }
 
-
-.subtitle-sinhala{
+.subtitle-sinhala {
     font-size: 1.1em;
     font-weight: bold;
     text-align: center;
     line-height: 25px;
+}
+
+/* =========================
+   NAVBAR (Responsive)
+========================= */
+
+.nav-glass {
+    position: fixed;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(1100px, calc(100vw - 28px));
+    z-index: 50;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 10px 14px;
+
+    background: rgba(255, 255, 255, 0.68);
+    border: 1px solid rgba(255, 92, 138, 0.16);
+    border-radius: 999px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.1);
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-brand {
+    text-decoration: none;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    color: #bb1b69;
+    padding: 8px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.nav-link {
+    text-decoration: none;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    font-size: 13px;
+    text-transform: uppercase;
+    color: rgba(42, 31, 37, 0.65);
+    padding: 10px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+    transition:
+        transform 0.15s ease,
+        background 0.15s ease;
+}
+
+.nav-link:hover {
+    background: rgba(255, 92, 138, 0.1);
+    transform: translateY(-1px);
+}
+
+/* hamburger hidden on desktop */
+.nav-mobile {
+    display: none;
+}
+
+/* burger button */
+.nav-burger {
+    border: 1px solid rgba(255, 92, 138, 0.18);
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 999px;
+    width: 44px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    padding: 0;
+}
+
+.nav-burger-line {
+    width: 18px;
+    height: 2px;
+    background: rgba(42, 31, 37, 0.7);
+    border-radius: 999px;
+    display: block;
+    margin: 2px 0;
+}
+
+/* dropdown menu */
+.nav-menu {
+    position: absolute;
+    top: 58px;
+    right: 12px;
+
+    width: min(260px, calc(100vw - 40px));
+    padding: 10px;
+
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(255, 92, 138, 0.18);
+    border-radius: 18px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+}
+
+.nav-menu-link {
+    display: block;
+    text-decoration: none;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 13px;
+
+    color: rgba(42, 31, 37, 0.75);
+    padding: 12px 12px;
+    border-radius: 14px;
+}
+
+.nav-menu-link:hover {
+    background: rgba(255, 92, 138, 0.12);
+}
+
+/* responsive behavior */
+@media (max-width: 720px) {
+    .nav-desktop {
+        display: none;
+    }
+    .nav-mobile {
+        display: block;
+    }
+    .nav-glass {
+        width: calc(100vw - 20px);
+        top: 10px;
+    }
+    .nav-brand {
+        letter-spacing: 0.14em;
+    }
+}
+/* =========================
+   MOBILE SCROLL FIX (iPhone)
+   - Allow scrolling on mobile only
+========================= */
+
+@media (max-width: 768px) {
+    html,
+    body {
+        overflow-y: auto !important;
+        height: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* pages that need scrolling */
+    .center-wrap {
+        min-height: 100dvh;
+        height: auto;
+        padding-top: 92px; /* space for navbar */
+        padding-bottom: 22px;
+    }
+
+    /* avoid content being trapped by fixed navbar */
+    .hero-card,
+    .hero-card-wide,
+    .comments-card {
+        max-height: none;
+    }
+}
+
+/* ==================================================
+   iOS / MOBILE SCROLL FIX
+   ================================================== */
+
+@media (max-width: 768px) {
+    html,
+    body {
+        overflow-y: auto !important;
+        height: auto !important;
+        min-height: 100dvh;
+        -webkit-overflow-scrolling: touch; /* iOS momentum */
+    }
+
+    /* allow content to scroll below fixed navbar */
+    .page-with-nav {
+        padding-top: 92px;
+        padding-bottom: 24px;
+    }
+
+    /* cards must not trap height */
+    .hero-card,
+    .hero-card-wide,
+    .comments-card {
+        max-height: none !important;
+    }
+}
+
+/* =========================================
+   NAVBAR RESPONSIVENESS
+   ========================================= */
+
+/* Hamburger button base */
+.nav-hamburger {
+    display: none; /* ❌ hidden by default */
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    cursor: pointer;
+
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+/* Hamburger lines */
+.nav-hamburger span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: rgba(42, 31, 37, 0.75);
+    border-radius: 2px;
+}
+
+/* ================= MOBILE ONLY ================= */
+@media (max-width: 768px) {
+    /* Hide desktop links */
+    .nav-desktop {
+        display: none;
+    }
+
+    /* Show hamburger */
+    .nav-hamburger {
+        display: block;
+    }
+}
+
+/* ================= DESKTOP ONLY ================= */
+@media (min-width: 769px) {
+    /* Ensure hamburger never shows */
+    .nav-hamburger {
+        display: none !important;
+    }
 }
