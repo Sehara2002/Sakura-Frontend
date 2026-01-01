@@ -137,7 +137,7 @@
       };
     } catch (err) {
       console.error(err);
-      if (loadingEl) loadingEl.textContent = "Failed to load book.";
+      if (loadingEl) loadingEl.textContent = "Failed to unveil the truth... Refresh yourself... Then Try Again...";
     }
   }
 
