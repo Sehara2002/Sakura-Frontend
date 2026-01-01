@@ -41,6 +41,10 @@ export default function BookPage() {
         src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
         strategy="afterInteractive"
       />
+      <Script
+        src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"
+        strategy="afterInteractive"
+      />
 
       {/* Your scripts */}
       <Script src="/js/sakura.js" strategy="afterInteractive" />
