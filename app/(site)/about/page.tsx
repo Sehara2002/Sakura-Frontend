@@ -20,7 +20,7 @@ export default function AboutPage() {
 
         <p className="subtitle" style={{ maxWidth: "auto" }}>
           Sakura is not only a traditional poetry collection. It is a story of unseen truth of life  where time, memory, and the present
-          connect what we know and what we can’t yet see. Everything has a hidden story — if we are patient enough to let it speak. Sakura is a story of that kind of people who tries to fight against to the past and embrace the present moment with calmness.
+          connect what we know and what we can’t yet see. Sakura emphasize that everything has a hidden story and we can see it if we are patient enough to reveal it. Sakura is a story of that kind of people who tries to fight against to the past and embrace the present moment with calmness.
         </p>
 
         {/* <div className="about-grid">
