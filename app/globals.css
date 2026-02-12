@@ -400,6 +400,41 @@ body.bg-sakura::before {
     background: linear-gradient(90deg, transparent, rgba(187, 27, 105, 0.6), transparent);
 }
 
+.home-actions {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+.btn-download {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 30px;
+    border-radius: 999px;
+    border: 2px solid rgba(255, 92, 138, 0.5);
+    background: rgba(255, 255, 255, 0.6);
+    color: #ff5c8a;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+    cursor: pointer;
+}
+
+.btn-download:hover {
+    transform: translateY(-1px);
+    border-color: rgba(255, 92, 138, 0.8);
+    background: rgba(255, 255, 255, 0.8);
+}
+
 .btn-read {
     display: inline-flex;
     align-items: center;
@@ -494,6 +529,9 @@ body.bg-sakura::before {
         margin: 14px auto 18px;
     }
     .btn-read {
+        width: 100%;
+    }
+    .btn-download {
         width: 100%;
     }
     .home-footnote {
@@ -1283,7 +1321,7 @@ body.bg-sakura::before {
 ========================= */
 
 .admin-wrap {
-    min-height: 100dvh;
+    min-height: 80dvh;
     display: grid;
     grid-template-columns: 320px 1fr;
     gap: 14px;
@@ -1477,7 +1515,7 @@ body.bg-sakura::before {
     -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
     padding: 18px;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .admin-content-head {
@@ -1582,10 +1620,16 @@ body.bg-sakura::before {
     padding: 16px;
 }
 
+/* Desktop scroll override for admin */
+body.page-admin {
+    overflow-y: auto !important;
+}
+
 /* Responsive */
 @media (max-width: 920px) {
     .admin-wrap {
         grid-template-columns: 1fr;
+        min-height: auto;
     }
 
     .admin-sidebar {
@@ -1621,6 +1665,8 @@ body.bg-sakura::before {
     body.page-about,
     body.page-author {
         overflow-y: auto !important; /* ✅ enable scroll */
+        height: auto !important;
+        min-height: 100dvh;
         -webkit-overflow-scrolling: touch;
     }
 
@@ -1896,4 +1942,12 @@ body.bg-sakura::before {
     .nav-hamburger {
         display: none !important;
     }
+}
+
+.page-admin{
+    overflow-y: scroll !important;
+}
+.admin-comments{
+    overflow-y: scroll !important;
+    max-height: fit-content !important;
 }

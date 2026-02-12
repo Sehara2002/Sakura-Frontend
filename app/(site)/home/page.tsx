@@ -29,9 +29,19 @@ export default function HomePage() {
 
           <div className="home-divider"></div>
 
-          <a className="btn-read" href="/book">
-            Read <span className="arrow">→</span>
-          </a>
+          <div className="home-actions">
+            <a className="btn-read" href="/book">
+              Read <span className="arrow">→</span>
+            </a>
+
+            <a
+              className="btn-read"
+              href="/books/sakura3.pdf"
+              download="sakura.pdf"
+            >
+              Download Chapter 01
+            </a>
+          </div>
 
           <p className="home-footnote">Truth is always unseen. But not hidden</p>
         </section>
