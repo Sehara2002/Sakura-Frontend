@@ -1,7 +1,8 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function HomePage() {
+  const [readCount, setReadCount] = useState<number | null>(null);
 
 
   useEffect(() => {
@@ -10,6 +11,15 @@ export default function HomePage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ key: "site_visits" }),
     }).catch(() => { });
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/stats?key=book_opens")
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => {
+        if (data && typeof data.value === "number") setReadCount(data.value);
+      })
+      .catch(() => { });
   }, []);
 
   return (
@@ -24,26 +34,27 @@ export default function HomePage() {
           <span className="home-badge">The story of unseen truth of life</span>
 
           <p className="home-subtitle">
-            <span>Chapter 01</span> is ready to be unveiled...
+            The site is resting for a short while. Thank you for walking this path.
           </p>
 
           <div className="home-divider"></div>
 
           <div className="home-actions">
-            <a className="btn-read" href="/book">
-              Read <span className="arrow">→</span>
-            </a>
-
-            <a
-              className="btn-read"
-              href="/books/sakura3.pdf"
-              download="sakura.pdf"
-            >
-              Download Chapter 01
-            </a>
+            <div className="home-readout" aria-live="polite">
+              <div className="home-read-num">
+                {readCount === null ? "—" : readCount.toLocaleString()}
+              </div>
+              <div className="home-read-label">Book reads</div>
+            </div>
           </div>
 
-          <p className="home-footnote">Truth is always unseen. But not hidden</p>
+          <p className="home-subtitle">
+            <strong className="home-thanks">Thank you</strong>, dear readers, for keeping the petals alive.
+          </p>
+
+          <p className="home-footnote">
+            When the last petal settles, a new verse will find its wind.
+          </p>
         </section>
       </main>
 

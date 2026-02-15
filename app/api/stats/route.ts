@@ -24,3 +24,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
+
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const key = String(searchParams.get("key") || "").trim();
+
+    const allowed = ["site_visits", "book_opens"];
+    if (!allowed.includes(key)) {
+      return NextResponse.json({ error: "Invalid stat key" }, { status: 400 });
+    }
+
+    await dbConnect();
+
+    const stat = await Stat.findOne({ key }).lean();
+    return NextResponse.json({ key, value: stat?.value ?? 0 });
+  } catch {
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}
